@@ -1,0 +1,46 @@
+version: "2"
+services:
+  redis:
+    image: redis:6.2.5-alpine
+    container_name: ofisino_redis
+    ports:
+      - "6379:6379"
+  db:
+    image: postgres:13.3-alpine
+    container_name: ofisino_db
+    env_file:
+      - backend/.env
+    ports:
+      - "54320:5432"
+    volumes:
+      - ofisino_db:/var/lib/postgresql/data
+  api:
+    build: backend
+    container_name: ofisino_api
+    env_file:
+      - backend/.env
+    ports:
+      - '8000:8000'
+    volumes:
+      - './backend/:/code/'
+    depends_on:
+      - redis
+      - db
+  front:
+    build: frontend
+    container_name: ofisino_frontend
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/user/src/app
+    depends_on:
+      - api
+
+networks:
+  default:
+    name: ofisino-network
+
+volumes:
+  ofisino_db:

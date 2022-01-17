@@ -1,0 +1,6 @@
+.vscode/
+.idea/
+docker-compose.override.yml
+node_modules/
+.venv/
+*.zip
